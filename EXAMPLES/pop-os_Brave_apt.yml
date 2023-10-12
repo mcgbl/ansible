@@ -1,0 +1,22 @@
+---
+# This works to get Brave Browser installed on Pop-OS
+- name: Update apt
+  hosts: all
+  become: true
+  pre_tasks:
+   - name: Download Brave Browser PGP Key
+     ansible.builtin.get_url:
+      url: https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+      dest: /usr/share/keyrings/brave-browser-archive-keyring.gpg
+      mode: '0440'
+   - name: Brave Browser source
+     ansible.builtin.shell: echo 'deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main' > /etc/apt/sources.list.d/brave-browser-release.list
+   - name: Install updates APT
+     ansible.builtin.package:
+      update_cache: true
+      only_upgrade: true
+   - name: Install ubuntu apps ++++++++++++++++++++
+     ansible.builtin.package:
+      name:
+       - curl # Needed for Brave maybe
+       - brave-browser

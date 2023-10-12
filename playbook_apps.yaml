@@ -1,0 +1,74 @@
+---
+- name: Update apt
+  hosts: all
+  become: true
+  tasks:
+   - name: Install updates APT
+     ansible.builtin.package:
+      update_cache: true
+      only_upgrade: true
+   - name: Install ubuntu apps (CLI apps) ++++++++++++++++++++
+     ansible.builtin.package:
+      name:
+       - flatpak
+       - fish
+       - neofetch
+       - yt-dlp
+       - network-manager-openvpn
+       - virt-manager
+       - net-tools
+       - xrdp
+       - krdc
+       - freerdp2-wayland
+       - spice-vdagent
+      state: present
+   - name: Remove Ubuntu apps ------------------------
+     ansible.builtin.package:
+      name:
+       - leocad
+       - firefox
+       - scribus
+       - inkscape
+       - shotwell
+       - audacity
+       - tuxpaint
+       - tuxpaint-config
+       - code # Not available in Ubuntu repo. Snap works well
+       - leocad
+       - cowsay
+       - libreoffice-*
+      state: absent
+   - name: Add the flathub flatpak repository remote to the user installation
+     community.general.flatpak_remote:
+      name: flathub
+      state: present
+      flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+      method: system
+   - name: Install Flathub graphical apps
+     community.general.flatpak:
+      name:
+       - com.nextcloud.desktopclient.nextcloud
+       - com.system76.Popsicle
+       - io.github.najepaliya.kleaner
+       - com.valvesoftware.Steam
+       - org.libreoffice.LibreOffice
+       - com.yubico.yubioath
+       - org.audacityteam.Audacity
+       - net.cozic.joplin_desktop
+       - com.visualstudio.code # test this and make sure it works well
+       - org.onlyoffice.desktopeditors
+       - org.polymc.PolyMC
+       - net.blockbench.Blockbench
+       - org.gnome.Shotwell
+       - com.github.unrud.VideoDownloader
+       - org.inkscape.Inkscape
+       - net.scribus.Scribus
+       - org.leocad.LeoCAD
+       - org.kde.krita
+      method: system
+      state: present
+   - name: Start spice-vdagent
+     ansible.builtin.service:
+      enabled: true
+      name: spice-vdagent
+      state: started
